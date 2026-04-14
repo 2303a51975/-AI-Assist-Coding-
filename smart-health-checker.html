@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MediSense — Smart Health Checker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --red: #E84040;
+    --red-dark: #B82E2E;
+    --red-light: #FDEAEA;
+    --navy: #0D1B2A;
+    --navy2: #1A2D42;
+    --teal: #0FA897;
+    --teal-light: #E0F7F5;
+    --amber: #F5A623;
+    --amber-light: #FEF3E0;
+    --green: #22C55E;
+    --green-light: #DCFCE7;
+    --white: #FFFFFF;
+    --gray50: #F8FAFC;
+    --gray100: #F1F5F9;
+    --gray200: #E2E8F0;
+    --gray400: #94A3B8;
+    --gray600: #475569;
+    --gray800: #1E293B;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--navy);
+    color: var(--white);
+    overflow-x: hidden;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1rem 2.5rem;
+    background: rgba(13,27,42,0.85);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+  }
+  .nav-logo { display: flex; align-items: center; gap: 10px; }
+  .nav-logo-icon {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: var(--red);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+  }
+  .nav-logo-text { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 18px; letter-spacing: -0.3px; }
+  .nav-logo-text span { color: var(--red); }
+  .nav-links { display: flex; gap: 2rem; align-items: center; }
+  .nav-links a { color: rgba(255,255,255,0.65); text-decoration: none; font-size: 14px; font-weight: 400; transition: color 0.2s; }
+  .nav-links a:hover { color: white; }
+  .nav-cta {
+    background: var(--red); color: white; border: none;
+    padding: 9px 20px; border-radius: 8px;
+    font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500;
+    cursor: pointer; transition: background 0.2s;
+  }
+  .nav-cta:hover { background: var(--red-dark); }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: flex; flex-direction: column; justify-content: center;
+    padding: 7rem 2.5rem 4rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-bg {
+    position: absolute; inset: 0; z-index: 0;
+    background: radial-gradient(ellipse 80% 60% at 70% 40%, rgba(232,64,64,0.13) 0%, transparent 70%),
+                radial-gradient(ellipse 50% 50% at 20% 80%, rgba(15,168,151,0.1) 0%, transparent 60%);
+  }
+  .hero-grid-lines {
+    position: absolute; inset: 0; z-index: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+  .hero-content { position: relative; z-index: 1; max-width: 700px; }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(232,64,64,0.15); border: 1px solid rgba(232,64,64,0.3);
+    padding: 6px 14px; border-radius: 100px;
+    font-size: 12px; font-weight: 500; color: #F87171;
+    margin-bottom: 1.8rem;
+    animation: fadeUp 0.6s ease both;
+  }
+  .hero-badge-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--red); animation: blink 1.5s ease-in-out infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+  .hero h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(42px, 6vw, 72px);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -2px;
+    margin-bottom: 1.2rem;
+    animation: fadeUp 0.6s 0.1s ease both;
+  }
+  .hero h1 em { font-style: normal; color: var(--red); }
+  .hero-sub {
+    font-size: 17px; font-weight: 300; line-height: 1.7;
+    color: rgba(255,255,255,0.65); max-width: 520px;
+    margin-bottom: 2.5rem;
+    animation: fadeUp 0.6s 0.2s ease both;
+  }
+  .hero-actions { display: flex; gap: 14px; flex-wrap: wrap; animation: fadeUp 0.6s 0.3s ease both; }
+  .btn-primary {
+    background: var(--red); color: white; border: none;
+    padding: 14px 28px; border-radius: 10px;
+    font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 500;
+    cursor: pointer; transition: transform 0.15s, background 0.2s;
+    text-decoration: none; display: inline-flex; align-items: center; gap: 8px;
+  }
+  .btn-primary:hover { background: var(--red-dark); transform: translateY(-1px); }
+  .btn-secondary {
+    background: transparent; color: white;
+    border: 1px solid rgba(255,255,255,0.2);
+    padding: 14px 28px; border-radius: 10px;
+    font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 400;
+    cursor: pointer; transition: border-color 0.2s, transform 0.15s;
+    text-decoration: none; display: inline-flex; align-items: center; gap: 8px;
+  }
+  .btn-secondary:hover { border-color: rgba(255,255,255,0.5); transform: translateY(-1px); }
+  .hero-stats {
+    display: flex; gap: 2.5rem; margin-top: 3.5rem;
+    padding-top: 2.5rem; border-top: 1px solid rgba(255,255,255,0.08);
+    animation: fadeUp 0.6s 0.4s ease both;
+  }
+  .hero-stat-val { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 700; color: white; }
+  .hero-stat-label { font-size: 12px; color: rgba(255,255,255,0.45); margin-top: 2px; }
+  .hero-visual {
+    position: absolute; right: 4%; top: 50%; transform: translateY(-50%);
+    width: min(380px, 38vw); z-index: 1;
+    animation: floatIn 0.8s 0.3s ease both;
+  }
+  @keyframes floatIn { from{opacity:0;transform:translateY(-40%) translateX(20px)} to{opacity:1;transform:translateY(-50%)} }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+
+  /* FLOATING CARD */
+  .float-card {
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px;
+    padding: 1.5rem;
+  }
+  .float-card-header { display: flex; align-items: center; gap: 10px; margin-bottom: 1.2rem; }
+  .float-card-icon { width: 40px; height: 40px; background: var(--red); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+  .float-card-title { font-family: 'Syne', sans-serif; font-weight: 600; font-size: 15px; }
+  .float-card-sub { font-size: 12px; color: rgba(255,255,255,0.5); }
+  .float-sym-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 1rem; }
+  .float-sym { background: rgba(255,255,255,0.07); border-radius: 8px; padding: 8px 10px; font-size: 12px; display: flex; align-items: center; gap: 6px; }
+  .float-sym.active { background: rgba(232,64,64,0.2); border: 1px solid rgba(232,64,64,0.4); }
+  .float-bar { background: rgba(255,255,255,0.07); border-radius: 6px; overflow: hidden; height: 6px; margin-bottom: 6px; }
+  .float-bar-fill { height: 6px; border-radius: 6px; }
+  .float-result-label { font-size: 11px; color: rgba(255,255,255,0.5); margin-bottom: 4px; }
+
+  /* SECTION COMMON */
+  section { padding: 5rem 2.5rem; }
+  .section-label {
+    font-size: 12px; font-weight: 500; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--teal); margin-bottom: 0.6rem;
+  }
+  .section-title {
+    font-family: 'Syne', sans-serif; font-size: clamp(28px,4vw,42px);
+    font-weight: 700; letter-spacing: -1px; color: white; margin-bottom: 1rem;
+  }
+  .section-sub { font-size: 16px; font-weight: 300; color: rgba(255,255,255,0.55); max-width: 500px; line-height: 1.7; }
+
+  /* CHECKER SECTION */
+  #checker { background: var(--gray50); color: var(--gray800); }
+  #checker .section-label { color: var(--red); }
+  #checker .section-title { color: var(--gray800); }
+  #checker .section-sub { color: var(--gray600); }
+  .checker-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 3rem; max-width: 1100px; }
+  .checker-box {
+    background: white; border-radius: 16px;
+    border: 1px solid var(--gray200); padding: 1.75rem;
+  }
+  .checker-box-title { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 600; color: var(--gray800); margin-bottom: 1.2rem; }
+  .sym-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .sym-item {
+    background: var(--gray100); border: 1.5px solid transparent; border-radius: 10px;
+    padding: 10px 6px; text-align: center; cursor: pointer;
+    transition: all 0.15s; font-size: 12px; color: var(--gray600); user-select: none;
+  }
+  .sym-item:hover { border-color: var(--red); color: var(--red); background: var(--red-light); }
+  .sym-item.sel { border-color: var(--red); background: var(--red-light); color: var(--red-dark); font-weight: 500; }
+  .sym-emoji { font-size: 22px; display: block; margin-bottom: 4px; }
+  .tags-row { display: flex; flex-wrap: wrap; gap: 6px; min-height: 32px; margin-bottom: 1rem; padding: 0.5rem 0; }
+  .sym-tag { background: var(--red-light); color: var(--red-dark); font-size: 12px; padding: 4px 10px; border-radius: 20px; display: flex; align-items: center; gap: 5px; }
+  .sym-tag-x { cursor: pointer; font-size: 14px; line-height: 1; }
+  .analyze-btn {
+    width: 100%; background: var(--red); color: white; border: none;
+    padding: 14px; border-radius: 10px; font-family: 'Syne', sans-serif;
+    font-size: 15px; font-weight: 600; cursor: pointer; transition: background 0.2s, transform 0.1s;
+    margin-top: 0.5rem;
+  }
+  .analyze-btn:hover:not(:disabled) { background: var(--red-dark); transform: translateY(-1px); }
+  .analyze-btn:disabled { background: var(--gray200); color: var(--gray400); cursor: default; transform: none; }
+  .result-box { display: none; }
+  .result-box.show { display: block; animation: fadeUp 0.4s ease both; }
+  .sev-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 500;
+    margin-bottom: 1rem;
+  }
+  .sev-low { background: var(--green-light); color: #15803D; }
+  .sev-med { background: var(--amber-light); color: #92400E; }
+  .sev-high { background: var(--red-light); color: var(--red-dark); }
+  .cond-row { margin-bottom: 10px; }
+  .cond-top { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px; color: var(--gray800); }
+  .cond-pct { font-weight: 500; color: var(--red); }
+  .cond-track { height: 6px; background: var(--gray100); border-radius: 4px; overflow: hidden; }
+  .cond-fill { height: 6px; border-radius: 4px; background: var(--red); transition: width 0.6s ease; }
+  .disclaimer { font-size: 11px; color: var(--gray400); margin-top: 1rem; font-style: italic; }
+
+  /* EMERGENCY */
+  #emergency {
+    background: linear-gradient(135deg, #0D1B2A 0%, #1A0A0A 100%);
+    position: relative; overflow: hidden;
+  }
+  #emergency::before {
+    content: ''; position: absolute; top: -100px; right: -100px;
+    width: 500px; height: 500px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(232,64,64,0.12) 0%, transparent 70%);
+  }
+  .emergency-content { position: relative; z-index: 1; }
+  .emergency-hero-bar {
+    background: var(--red); border-radius: 16px;
+    padding: 1.5rem 2rem; display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 1rem; margin-bottom: 2.5rem;
+    animation: pulse-border 2s ease-in-out infinite;
+  }
+  @keyframes pulse-border { 0%,100%{box-shadow:0 0 0 0 rgba(232,64,64,0.5)} 50%{box-shadow:0 0 0 12px rgba(232,64,64,0)} }
+  .em-bar-left { display: flex; align-items: center; gap: 14px; }
+  .em-icon { font-size: 36px; }
+  .em-title { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 700; }
+  .em-sub { font-size: 14px; opacity: 0.85; margin-top: 2px; }
+  .sos-big-btn {
+    background: white; color: var(--red); border: none;
+    padding: 14px 32px; border-radius: 10px;
+    font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700;
+    cursor: pointer; transition: transform 0.1s, box-shadow 0.2s;
+    letter-spacing: 1px;
+  }
+  .sos-big-btn:hover { transform: scale(1.04); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+  .em-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; margin-bottom: 2.5rem; }
+  .em-service-card {
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px; padding: 1.2rem; cursor: pointer;
+    transition: background 0.2s, border-color 0.2s, transform 0.15s;
+  }
+  .em-service-card:hover { background: rgba(255,255,255,0.09); border-color: rgba(255,255,255,0.2); transform: translateY(-2px); }
+  .em-svc-icon { font-size: 28px; margin-bottom: 8px; }
+  .em-svc-name { font-family: 'Syne', sans-serif; font-weight: 600; font-size: 14px; }
+  .em-svc-num { font-size: 22px; font-weight: 700; color: var(--red); font-family: 'Syne', sans-serif; margin: 2px 0; }
+  .em-svc-desc { font-size: 11px; color: rgba(255,255,255,0.45); }
+
+  /* DOCTORS */
+  #doctors { background: white; color: var(--gray800); }
+  #doctors .section-label { color: var(--red); }
+  #doctors .section-title { color: var(--gray800); }
+  #doctors .section-sub { color: var(--gray600); }
+  .doctors-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; margin-top: 2.5rem; }
+  .doc-card {
+    background: var(--gray50); border: 1px solid var(--gray200); border-radius: 16px;
+    padding: 1.5rem; transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .doc-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,0,0,0.08); }
+  .doc-card-header { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 1rem; }
+  .doc-avatar-wrap { position: relative; }
+  .doc-av {
+    width: 52px; height: 52px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px; flex-shrink: 0;
+  }
+  .doc-online { position: absolute; bottom: 2px; right: 2px; width: 12px; height: 12px; border-radius: 50%; background: var(--green); border: 2px solid white; }
+  .doc-name { font-family: 'Syne', sans-serif; font-weight: 600; font-size: 14px; color: var(--gray800); }
+  .doc-spec { font-size: 12px; color: var(--gray600); margin: 2px 0; }
+  .doc-stars { font-size: 12px; color: var(--amber); }
+  .doc-avail { font-size: 11px; font-weight: 500; color: #15803D; background: var(--green-light); padding: 3px 10px; border-radius: 20px; display: inline-block; margin-bottom: 0.75rem; }
+  .doc-avail.busy { color: #92400E; background: var(--amber-light); }
+  .doc-call-btn {
+    width: 100%; background: var(--red); color: white; border: none;
+    padding: 9px; border-radius: 8px; font-size: 13px; font-weight: 500;
+    cursor: pointer; transition: background 0.2s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .doc-call-btn:hover { background: var(--red-dark); }
+
+  /* HOSPITALS */
+  #hospitals { background: var(--gray50); color: var(--gray800); }
+  #hospitals .section-label { color: var(--red); }
+  #hospitals .section-title { color: var(--gray800); }
+  #hospitals .section-sub { color: var(--gray600); }
+  .hosp-grid { display: grid; gap: 12px; margin-top: 2.5rem; max-width: 800px; }
+  .hosp-row {
+    background: white; border: 1px solid var(--gray200); border-radius: 14px;
+    padding: 1.2rem 1.5rem; display: flex; align-items: center; gap: 1rem;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .hosp-row:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.07); }
+  .hosp-num { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; color: var(--gray400); min-width: 24px; }
+  .hosp-icon { font-size: 28px; flex-shrink: 0; }
+  .hosp-info { flex: 1; }
+  .hosp-name { font-family: 'Syne', sans-serif; font-weight: 600; font-size: 14px; color: var(--gray800); }
+  .hosp-meta { font-size: 12px; color: var(--gray600); margin-top: 2px; }
+  .hosp-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+  .hosp-dist { background: #EFF6FF; color: #1D4ED8; font-size: 12px; font-weight: 500; padding: 4px 10px; border-radius: 20px; }
+  .hosp-nav {
+    background: var(--navy); color: white; border: none;
+    padding: 8px 16px; border-radius: 8px; font-size: 12px; font-weight: 500;
+    cursor: pointer; transition: background 0.2s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .hosp-nav:hover { background: var(--navy2); }
+
+  /* VITALS */
+  #vitals { background: var(--navy); }
+  .vitals-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 2.5rem; max-width: 1000px; }
+  .vitals-input-box {
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px; padding: 1.5rem;
+  }
+  .vital-row { margin-bottom: 1.2rem; }
+  .vital-row label { font-size: 13px; color: rgba(255,255,255,0.6); margin-bottom: 6px; display: block; }
+  .vital-input {
+    width: 100%; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px; padding: 10px 14px; color: white; font-family: 'DM Sans', sans-serif;
+    font-size: 14px; outline: none; transition: border-color 0.2s;
+  }
+  .vital-input:focus { border-color: var(--teal); }
+  .vital-input::placeholder { color: rgba(255,255,255,0.2); }
+  .check-vital-btn {
+    width: 100%; background: var(--teal); color: white; border: none;
+    padding: 13px; border-radius: 10px; font-family: 'Syne', sans-serif;
+    font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.2s;
+  }
+  .check-vital-btn:hover { background: #0D9488; }
+  .vitals-result-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .vital-card {
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px; padding: 1.1rem; text-align: center;
+  }
+  .vital-val { font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 700; }
+  .vital-label { font-size: 11px; color: rgba(255,255,255,0.45); margin-top: 3px; }
+  .vital-status { font-size: 11px; font-weight: 500; margin-top: 5px; }
+  .v-ok { color: #4ADE80; }
+  .v-warn { color: var(--amber); }
+  .v-danger { color: #F87171; }
+
+  /* TIPS */
+  #tips { background: linear-gradient(135deg, #0A1628 0%, #0D1B2A 100%); }
+  .tips-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; margin-top: 2.5rem; }
+  .tip-card {
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 14px; padding: 1.5rem;
+    transition: transform 0.2s, border-color 0.2s;
+  }
+  .tip-card:hover { transform: translateY(-3px); border-color: rgba(255,255,255,0.15); }
+  .tip-card-icon { font-size: 32px; margin-bottom: 0.8rem; }
+  .tip-card-title { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 600; margin-bottom: 0.4rem; }
+  .tip-card-text { font-size: 13px; color: rgba(255,255,255,0.55); line-height: 1.6; }
+
+  /* FOOTER */
+  footer {
+    background: #080F18; padding: 3rem 2.5rem 2rem;
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+  .footer-inner { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 2rem; max-width: 1100px; margin: 0 auto; }
+  .footer-brand { max-width: 280px; }
+  .footer-brand-name { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; margin-bottom: 0.5rem; }
+  .footer-brand-name span { color: var(--red); }
+  .footer-brand-desc { font-size: 13px; color: rgba(255,255,255,0.4); line-height: 1.6; }
+  .footer-links h4 { font-size: 12px; font-weight: 500; color: rgba(255,255,255,0.4); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 0.8rem; }
+  .footer-links a { display: block; font-size: 13px; color: rgba(255,255,255,0.6); text-decoration: none; margin-bottom: 6px; transition: color 0.2s; }
+  .footer-links a:hover { color: white; }
+  .footer-bottom { text-align: center; margin-top: 2.5rem; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.05); font-size: 12px; color: rgba(255,255,255,0.25); }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--navy); }
+  ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 3px; }
+
+  /* MODAL */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 999; align-items: center; justify-content: center; }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: white; border-radius: 16px; padding: 2rem; max-width: 380px; width: 90%;
+    color: var(--gray800); animation: fadeUp 0.3s ease both;
+  }
+  .modal h3 { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; margin-bottom: 0.5rem; }
+  .modal p { font-size: 14px; color: var(--gray600); margin-bottom: 1.2rem; }
+  .modal-close {
+    width: 100%; background: var(--red); color: white; border: none;
+    padding: 12px; border-radius: 8px; font-size: 14px; font-weight: 500;
+    cursor: pointer; font-family: 'DM Sans', sans-serif;
+  }
+
+  @media (max-width: 768px) {
+    nav { padding: 1rem 1.2rem; }
+    .nav-links { display: none; }
+    .hero { padding: 5rem 1.2rem 3rem; }
+    .hero-visual { display: none; }
+    section { padding: 3.5rem 1.2rem; }
+    .checker-layout { grid-template-columns: 1fr; }
+    .vitals-layout { grid-template-columns: 1fr; }
+    .hero-stats { gap: 1.5rem; }
+    .em-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">
+    <div class="nav-logo-icon">✚</div>
+    <div class="nav-logo-text">Medi<span>Sense</span></div>
+  </div>
+  <div class="nav-links">
+    <a href="#checker">Symptom Check</a>
+    <a href="#emergency">Emergency</a>
+    <a href="#doctors">Doctors</a>
+    <a href="#hospitals">Hospitals</a>
+    <a href="#vitals">Vitals</a>
+  </div>
+  <button class="nav-cta" onclick="document.getElementById('checker').scrollIntoView({behavior:'smooth'})">Check Symptoms</button>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid-lines"></div>
+  <div class="hero-content">
+    <div class="hero-badge"><span class="hero-badge-dot"></span> AI-powered · Real-time analysis</div>
+    <h1>Your <em>Smart</em><br>Health<br>Companion</h1>
+    <p class="hero-sub">Instantly check your symptoms, get AI-driven insights, and connect with nearby doctors and hospitals in seconds.</p>
+    <div class="hero-actions">
+      <a href="#checker" class="btn-primary">✦ Check Symptoms</a>
+      <a href="#emergency" class="btn-secondary">🚨 Emergency</a>
+    </div>
+    <div class="hero-stats">
+      <div><div class="hero-stat-val">50+</div><div class="hero-stat-label">Symptoms covered</div></div>
+      <div><div class="hero-stat-val">24/7</div><div class="hero-stat-label">Emergency support</div></div>
+      <div><div class="hero-stat-val">15+</div><div class="hero-stat-label">Nearby hospitals</div></div>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="float-card">
+      <div class="float-card-header">
+        <div class="float-card-icon">🧠</div>
+        <div>
+          <div class="float-card-title">AI Diagnosis</div>
+          <div class="float-card-sub">Analyzing 3 symptoms...</div>
+        </div>
+      </div>
+      <div class="float-sym-grid">
+        <div class="float-sym active">🌡️ Fever</div>
+        <div class="float-sym active">😷 Cough</div>
+        <div class="float-sym active">🤕 Headache</div>
+        <div class="float-sym">😴 Fatigue</div>
+      </div>
+      <div class="float-result-label">Top match — Influenza</div>
+      <div class="float-bar"><div class="float-bar-fill" style="width:82%;background:var(--red)"></div></div>
+      <div class="float-result-label">Viral Fever</div>
+      <div class="float-bar"><div class="float-bar-fill" style="width:61%;background:var(--amber)"></div></div>
+      <div class="float-result-label">Common Cold</div>
+      <div class="float-bar"><div class="float-bar-fill" style="width:44%;background:var(--teal)"></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- SYMPTOM CHECKER -->
+<section id="checker">
+  <div class="section-label">Symptom Checker</div>
+  <div class="section-title">What are you feeling?</div>
+  <p class="section-sub">Select all symptoms you're experiencing for an instant AI analysis.</p>
+  <div class="checker-layout">
+    <div class="checker-box">
+      <div class="checker-box-title">Select symptoms</div>
+      <div class="sym-grid" id="symGrid"></div>
+      <div style="margin-top:1rem;">
+        <div style="font-size:12px;color:var(--gray400);margin-bottom:6px;">Selected:</div>
+        <div class="tags-row" id="tagsRow"><span style="font-size:12px;color:var(--gray400);">None selected</span></div>
+      </div>
+      <button class="analyze-btn" id="analyzeBtn" onclick="doAnalyze()" disabled>Analyze My Symptoms →</button>
+    </div>
+    <div class="checker-box">
+      <div class="checker-box-title">AI Analysis</div>
+      <div id="resultPlaceholder" style="text-align:center;padding:3rem 1rem;color:var(--gray400);">
+        <div style="font-size:48px;margin-bottom:1rem;">🔬</div>
+        <p style="font-size:14px;">Select symptoms on the left and click <strong>Analyze</strong> to see results</p>
+      </div>
+      <div class="result-box" id="resultBox">
+        <div id="sevBadge"></div>
+        <div id="condBox"></div>
+        <p class="disclaimer">⚠ Not a medical diagnosis. Please consult a licensed physician.</p>
+        <button class="analyze-btn" style="margin-top:1rem;background:var(--navy);" onclick="document.getElementById('doctors').scrollIntoView({behavior:'smooth'})">Find a Doctor →</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EMERGENCY -->
+<section id="emergency">
+  <div class="emergency-content">
+    <div class="section-label">Emergency Services</div>
+    <div class="section-title">Immediate Help</div>
+    <p class="section-sub" style="margin-bottom:2rem;">In a life-threatening situation? Act immediately. Every second counts.</p>
+    <div class="emergency-hero-bar">
+      <div class="em-bar-left">
+        <div class="em-icon">🚨</div>
+        <div>
+          <div class="em-title">Medical Emergency? Call 112 Now</div>
+          <div class="em-sub">24/7 ambulance, trauma care &amp; critical services across India</div>
+        </div>
+      </div>
+      <button class="sos-big-btn" onclick="sosCall()">SOS · CALL 112</button>
+    </div>
+    <div class="em-grid">
+      <div class="em-service-card" onclick="callService('108')">
+        <div class="em-svc-icon">🚑</div>
+        <div class="em-svc-name">Ambulance</div>
+        <div class="em-svc-num">108</div>
+        <div class="em-svc-desc">Free ambulance service — Telangana</div>
+      </div>
+      <div class="em-service-card" onclick="callService('104')">
+        <div class="em-svc-icon">🏥</div>
+        <div class="em-svc-name">Health Helpline</div>
+        <div class="em-svc-num">104</div>
+        <div class="em-svc-desc">Government medical advice line</div>
+      </div>
+      <div class="em-service-card" onclick="callService('100')">
+        <div class="em-svc-icon">👮</div>
+        <div class="em-svc-name">Police</div>
+        <div class="em-svc-num">100</div>
+        <div class="em-svc-desc">For safety &amp; law enforcement</div>
+      </div>
+      <div class="em-service-card" onclick="callService('101')">
+        <div class="em-svc-icon">🔥</div>
+        <div class="em-svc-name">Fire & Rescue</div>
+        <div class="em-svc-num">101</div>
+        <div class="em-svc-desc">Fire brigade &amp; rescue operations</div>
+      </div>
+      <div class="em-service-card" onclick="callService('1097')">
+        <div class="em-svc-icon">🩸</div>
+        <div class="em-svc-name">Blood Bank</div>
+        <div class="em-svc-num">1097</div>
+        <div class="em-svc-desc">Emergency blood availability</div>
+      </div>
+      <div class="em-service-card" onclick="callService('9152987821')">
+        <div class="em-svc-icon">🧠</div>
+        <div class="em-svc-name">Mental Health</div>
+        <div class="em-svc-num">iCall</div>
+        <div class="em-svc-desc">Psychological support helpline</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DOCTORS -->
+<section id="doctors">
+  <div class="section-label">Nearby Doctors</div>
+  <div class="section-title">Consult a Specialist</div>
+  <p class="section-sub">Top-rated physicians near Khammam, Telangana — available for in-person or teleconsultation.</p>
+  <div class="doctors-grid" id="doctorsGrid"></div>
+</section>
+
+<!-- HOSPITALS -->
+<section id="hospitals">
+  <div class="section-label">Nearby Hospitals</div>
+  <div class="section-title">Find Care Near You</div>
+  <p class="section-sub">Hospitals within Khammam district with emergency and specialty services.</p>
+  <div class="hosp-grid" id="hospGrid"></div>
+</section>
+
+<!-- VITALS -->
+<section id="vitals">
+  <div class="section-label">Vitals Tracker</div>
+  <div class="section-title">Check Your Vitals</div>
+  <p class="section-sub">Enter your readings to instantly see if they're in the healthy range.</p>
+  <div class="vitals-layout">
+    <div class="vitals-input-box">
+      <div class="vital-row">
+        <label>Body Temperature (°F)</label>
+        <input class="vital-input" id="vTemp" type="number" placeholder="e.g. 98.6" step="0.1">
+      </div>
+      <div class="vital-row">
+        <label>Heart Rate (bpm)</label>
+        <input class="vital-input" id="vHr" type="number" placeholder="e.g. 72">
+      </div>
+      <div class="vital-row">
+        <label>Blood Pressure (systolic mmHg)</label>
+        <input class="vital-input" id="vBp" type="number" placeholder="e.g. 120">
+      </div>
+      <div class="vital-row">
+        <label>Oxygen Saturation SpO2 (%)</label>
+        <input class="vital-input" id="vSpo2" type="number" placeholder="e.g. 98">
+      </div>
+      <button class="check-vital-btn" onclick="checkVitals()">Analyze Vitals →</button>
+    </div>
+    <div>
+      <div class="vitals-result-grid" id="vitalsResultGrid">
+        <div class="vital-card"><div class="vital-val" id="vv-temp" style="color:var(--teal);">—</div><div class="vital-label">Temperature</div><div class="vital-status" id="vs-temp">Enter value</div></div>
+        <div class="vital-card"><div class="vital-val" id="vv-hr" style="color:#60A5FA;">—</div><div class="vital-label">Heart Rate</div><div class="vital-status" id="vs-hr">Enter value</div></div>
+        <div class="vital-card"><div class="vital-val" id="vv-bp" style="color:var(--amber);">—</div><div class="vital-label">Blood Pressure</div><div class="vital-status" id="vs-bp">Enter value</div></div>
+        <div class="vital-card"><div class="vital-val" id="vv-spo2" style="color:#A78BFA;">—</div><div class="vital-label">SpO2</div><div class="vital-status" id="vs-spo2">Enter value</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HEALTH TIPS -->
+<section id="tips">
+  <div class="section-label">Wellness</div>
+  <div class="section-title">Stay Healthy</div>
+  <p class="section-sub">Science-backed tips for everyday wellbeing.</p>
+  <div class="tips-grid">
+    <div class="tip-card"><div class="tip-card-icon">💧</div><div class="tip-card-title">Hydration</div><div class="tip-card-text">Drink 8–10 glasses of water daily. Hydration supports circulation, digestion, and immune defense.</div></div>
+    <div class="tip-card"><div class="tip-card-icon">😴</div><div class="tip-card-title">Quality Sleep</div><div class="tip-card-text">7–9 hours of sleep nightly helps repair cells, regulate hormones, and boost immunity.</div></div>
+    <div class="tip-card"><div class="tip-card-icon">🥗</div><div class="tip-card-title">Balanced Diet</div><div class="tip-card-text">Eat whole foods rich in vitamins and minerals. Reduce processed sugars and excessive sodium.</div></div>
+    <div class="tip-card"><div class="tip-card-icon">🏃</div><div class="tip-card-title">Stay Active</div><div class="tip-card-text">30 minutes of moderate exercise most days reduces chronic disease risk significantly.</div></div>
+    <div class="tip-card"><div class="tip-card-icon">🧘</div><div class="tip-card-title">Manage Stress</div><div class="tip-card-text">Chronic stress weakens immunity. Practice mindfulness, breathing, or meditation regularly.</div></div>
+    <div class="tip-card"><div class="tip-card-icon">🩺</div><div class="tip-card-title">Regular Check-ups</div><div class="tip-card-text">Annual health screenings catch issues early — prevention is always better than cure.</div></div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="footer-brand-name">Medi<span>Sense</span></div>
+      <p class="footer-brand-desc">AI-powered health companion for fast, reliable symptom checking and emergency care coordination — built for India.</p>
+    </div>
+    <div class="footer-links">
+      <h4>Services</h4>
+      <a href="#checker">Symptom Checker</a>
+      <a href="#vitals">Vitals Tracker</a>
+      <a href="#doctors">Find Doctors</a>
+      <a href="#hospitals">Hospitals</a>
+    </div>
+    <div class="footer-links">
+      <h4>Emergency</h4>
+      <a href="tel:112">Call 112</a>
+      <a href="tel:108">Ambulance 108</a>
+      <a href="tel:104">Health Line 104</a>
+      <a href="tel:100">Police 100</a>
+    </div>
+    <div class="footer-links">
+      <h4>Disclaimer</h4>
+      <a href="#">Not a medical device</a>
+      <a href="#">Consult your doctor</a>
+      <a href="#">Privacy policy</a>
+    </div>
+  </div>
+  <div class="footer-bottom">© 2026 MediSense · Built for Khammam, Telangana · For educational purposes only · Always consult a licensed physician.</div>
+</footer>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal" id="modalBox">
+    <h3 id="modalTitle">Emergency Call</h3>
+    <p id="modalBody">Connecting you now...</p>
+    <button class="modal-close" onclick="document.getElementById('modalOverlay').classList.remove('open')">Close</button>
+  </div>
+</div>
+
+<script>
+const symptoms = [
+  {id:'fever',label:'Fever',icon:'🌡️'},
+  {id:'headache',label:'Headache',icon:'🤕'},
+  {id:'cough',label:'Cough',icon:'😷'},
+  {id:'sorethroat',label:'Sore Throat',icon:'🗣️'},
+  {id:'fatigue',label:'Fatigue',icon:'😴'},
+  {id:'nausea',label:'Nausea',icon:'🤢'},
+  {id:'chestpain',label:'Chest Pain',icon:'💔'},
+  {id:'shortbreath',label:'Breathlessness',icon:'🫁'},
+  {id:'bodyache',label:'Body Ache',icon:'🦴'},
+  {id:'dizziness',label:'Dizziness',icon:'😵'},
+  {id:'rash',label:'Skin Rash',icon:'🔴'},
+  {id:'stomachpain',label:'Stomach Pain',icon:'🫃'},
+];
+
+const doctors = [
+  {name:'Dr. Priya Sharma',spec:'General Physician',rating:'★★★★★',avail:'Available now',avail_class:'',bg:'#FEE2E2',icon:'👩‍⚕️'},
+  {name:'Dr. Rajesh Kumar',spec:'Internal Medicine',rating:'★★★★☆',avail:'Available in 20 min',avail_class:'',bg:'#DCFCE7',icon:'👨‍⚕️'},
+  {name:'Dr. Anita Rao',spec:'Pulmonologist',rating:'★★★★★',avail:'Available now',avail_class:'',bg:'#FEF9C3',icon:'👩‍⚕️'},
+  {name:'Dr. Suresh Nair',spec:'Cardiologist',rating:'★★★★☆',avail:'Busy · 1 hr wait',avail_class:'busy',bg:'#EDE9FE',icon:'👨‍⚕️'},
+  {name:'Dr. Meena Reddy',spec:'Dermatologist',rating:'★★★★★',avail:'Available now',avail_class:'',bg:'#FCE7F3',icon:'👩‍⚕️'},
+  {name:'Dr. Venkat Rao',spec:'Gastroenterologist',rating:'★★★★☆',avail:'Available in 30 min',avail_class:'',bg:'#E0F2FE',icon:'👨‍⚕️'},
+  {name:'Dr. Lakshmi Devi',spec:'Gynaecologist',rating:'★★★★★',avail:'Available now',avail_class:'',bg:'#FDF2F8',icon:'👩‍⚕️'},
+  {name:'Dr. Arjun Patel',spec:'Orthopedic',rating:'★★★★☆',avail:'Available in 45 min',avail_class:'',bg:'#F0FDF4',icon:'👨‍⚕️'},
+];
+
+const hospitals = [
+  {name:'Khammam Government Hospital',type:'Multi-specialty · Emergency 24/7 · Free services',dist:'1.2 km',map:'Khammam+Government+Hospital'},
+  {name:'Apollo Clinic Khammam',type:'Private · General & Emergency · Pharmacy on-site',dist:'2.5 km',map:'Apollo+Clinic+Khammam'},
+  {name:'Care Hospital Khammam',type:'Multi-specialty · ICU · Cardiac care available',dist:'3.8 km',map:'Care+Hospital+Khammam'},
+  {name:'Medicover Hospital',type:'Super-specialty · All departments · 24/7 lab',dist:'5.1 km',map:'Medicover+Hospital+Khammam'},
+  {name:'Area Hospital Khammam',type:'Government · Trauma center · Dialysis unit',dist:'6.4 km',map:'Area+Hospital+Khammam'},
+];
+
+const conditionRules = [
+  {keys:['chestpain','shortbreath'],name:'Cardiac emergency — seek immediate care',pct:93,level:'high'},
+  {keys:['fever','cough','sorethroat'],name:'Influenza / Flu',pct:84,level:'med'},
+  {keys:['fever','bodyache','fatigue'],name:'COVID-19 / Viral illness',pct:76,level:'med'},
+  {keys:['headache','nausea','dizziness'],name:'Migraine / Vertigo',pct:72,level:'med'},
+  {keys:['cough','shortbreath'],name:'Bronchitis / Asthma',pct:68,level:'med'},
+  {keys:['nausea','stomachpain'],name:'Gastroenteritis',pct:77,level:'low'},
+  {keys:['rash','fever'],name:'Dengue / Allergic reaction',pct:61,level:'med'},
+  {keys:['fever','headache'],name:'Viral fever',pct:65,level:'low'},
+];
+
+let selected = new Set();
+
+function renderSymptoms() {
+  document.getElementById('symGrid').innerHTML = symptoms.map(s=>`
+    <div class="sym-item ${selected.has(s.id)?'sel':''}" onclick="toggleSym('${s.id}')">
+      <span class="sym-emoji">${s.icon}</span>${s.label}
+    </div>
+  `).join('');
+}
+
+function toggleSym(id) {
+  selected.has(id) ? selected.delete(id) : selected.add(id);
+  renderSymptoms(); renderTags();
+  document.getElementById('analyzeBtn').disabled = selected.size===0;
+  document.getElementById('resultBox').classList.remove('show');
+  document.getElementById('resultPlaceholder').style.display='block';
+}
+
+function renderTags() {
+  const r = document.getElementById('tagsRow');
+  if(!selected.size){r.innerHTML='<span style="font-size:12px;color:var(--gray400);">None selected</span>';return;}
+  r.innerHTML=[...selected].map(id=>{const s=symptoms.find(x=>x.id===id);return`<span class="sym-tag">${s.icon} ${s.label}<span class="sym-tag-x" onclick="toggleSym('${id}')">×</span></span>`;}).join('');
+}
+
+function doAnalyze() {
+  const sel=[...selected];
+  let best=null,bestScore=0;
+  conditionRules.forEach(rule=>{
+    const score=rule.keys.filter(k=>sel.includes(k)).length;
+    if(score>=2&&score>bestScore){bestScore=score;best=rule;}
+  });
+  const results=best?[
+    {name:best.name,pct:best.pct},
+    {name:'Common Cold',pct:Math.max(18,best.pct-30)},
+    {name:'Stress / Fatigue syndrome',pct:Math.max(12,best.pct-48)},
+  ]:[
+    {name:'Common Cold',pct:48},{name:'Seasonal Allergies',pct:35},{name:'General Fatigue',pct:22}
+  ];
+  const level=best?best.level:'low';
+  const badges={high:'<span class="sev-badge sev-high">⚠ High severity — seek emergency care now</span>',med:'<span class="sev-badge sev-med">⚡ Moderate — consult a doctor soon</span>',low:'<span class="sev-badge sev-low">✔ Mild — rest and monitor</span>'};
+  document.getElementById('sevBadge').innerHTML=badges[level];
+  document.getElementById('condBox').innerHTML=results.map(r=>`<div class="cond-row"><div class="cond-top"><span>${r.name}</span><span class="cond-pct">${r.pct}%</span></div><div class="cond-track"><div class="cond-fill" style="width:${r.pct}%"></div></div></div>`).join('');
+  document.getElementById('resultPlaceholder').style.display='none';
+  document.getElementById('resultBox').classList.add('show');
+}
+
+function renderDoctors() {
+  document.getElementById('doctorsGrid').innerHTML=doctors.map(d=>`
+    <div class="doc-card">
+      <div class="doc-card-header">
+        <div class="doc-avatar-wrap">
+          <div class="doc-av" style="background:${d.bg}">${d.icon}</div>
+          ${d.avail_class===''?'<div class="doc-online"></div>':''}
+        </div>
+        <div>
+          <div class="doc-name">${d.name}</div>
+          <div class="doc-spec">${d.spec}</div>
+          <div class="doc-stars">${d.rating}</div>
+        </div>
+      </div>
+      <div class="doc-avail ${d.avail_class}">${d.avail_class===''?'● ':''} ${d.avail}</div>
+      <button class="doc-call-btn" onclick="callDoc('${d.name}')">📞 Call / Book Appointment</button>
+    </div>
+  `).join('');
+}
+
+function renderHospitals() {
+  document.getElementById('hospGrid').innerHTML=hospitals.map((h,i)=>`
+    <div class="hosp-row">
+      <div class="hosp-num">${String(i+1).padStart(2,'0')}</div>
+      <div class="hosp-icon">🏥</div>
+      <div class="hosp-info">
+        <div class="hosp-name">${h.name}</div>
+        <div class="hosp-meta">${h.type}</div>
+      </div>
+      <div class="hosp-right">
+        <span class="hosp-dist">${h.dist}</span>
+        <button class="hosp-nav" onclick="navHosp('${h.map}')">Navigate ↗</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function checkVitals() {
+  const temp=parseFloat(document.getElementById('vTemp').value);
+  const hr=parseFloat(document.getElementById('vHr').value);
+  const bp=parseFloat(document.getElementById('vBp').value);
+  const spo2=parseFloat(document.getElementById('vSpo2').value);
+  if(temp){
+    document.getElementById('vv-temp').textContent=temp+'°';
+    const st=temp<97?'Low ⬇':temp>99.5?'Fever 🌡️':'Normal ✔';
+    const sc=temp<97?'v-warn':temp>99.5?'v-danger':'v-ok';
+    document.getElementById('vs-temp').textContent=st;
+    document.getElementById('vs-temp').className='vital-status '+sc;
+  }
+  if(hr){
+    document.getElementById('vv-hr').textContent=hr;
+    const st=hr<60?'Low (bradycardia)':hr>100?'High (tachycardia)':'Normal ✔';
+    const sc=hr<60||hr>100?'v-warn':'v-ok';
+    document.getElementById('vs-hr').textContent=st;
+    document.getElementById('vs-hr').className='vital-status '+sc;
+  }
+  if(bp){
+    document.getElementById('vv-bp').textContent=bp;
+    const st=bp<90?'Low BP ⬇':bp>140?'High BP ⚠':bp>120?'Elevated':'Normal ✔';
+    const sc=bp<90||bp>140?'v-danger':bp>120?'v-warn':'v-ok';
+    document.getElementById('vs-bp').textContent=st;
+    document.getElementById('vs-bp').className='vital-status '+sc;
+  }
+  if(spo2){
+    document.getElementById('vv-spo2').textContent=spo2+'%';
+    const st=spo2<94?'Low — seek care ⚠':spo2<96?'Monitor closely':'Normal ✔';
+    const sc=spo2<94?'v-danger':spo2<96?'v-warn':'v-ok';
+    document.getElementById('vs-spo2').textContent=st;
+    document.getElementById('vs-spo2').className='vital-status '+sc;
+  }
+}
+
+function showModal(title, body) {
+  document.getElementById('modalTitle').textContent=title;
+  document.getElementById('modalBody').textContent=body;
+  document.getElementById('modalOverlay').classList.add('open');
+}
+function closeModal(e){if(e.target===document.getElementById('modalOverlay'))document.getElementById('modalOverlay').classList.remove('open');}
+function sosCall(){showModal('🚨 Emergency — Calling 112','This would dial 112 (Emergency Services) on a real mobile device. Please call immediately in a real emergency.');}
+function callService(num){showModal('📞 Calling '+num,'This would dial '+num+' on a real device. On mobile, tap the number to call directly.');}
+function callDoc(name){showModal('📞 Calling '+name,'This would open a booking/call interface in a live app. On mobile, this connects to the doctor\'s appointment system.');}
+function navHosp(q){window.open('https://maps.google.com?q='+encodeURIComponent(q+' Telangana India'),'_blank');}
+
+renderSymptoms(); renderTags(); renderDoctors(); renderHospitals();
+</script>
+</body>
+</html>
